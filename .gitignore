@@ -6,6 +6,7 @@
 
 # firestore
 serviceAccountKey.json
+cliantSideFunction.ts
 
 # dependencies
 /node_modules
