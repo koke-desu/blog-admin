@@ -46,3 +46,14 @@ export type Tags = {
   name: string;
   children: Tag[];
 };
+
+// firebase側のpostの初期値
+export const initial_post = {
+  body: "body",
+  title: "title",
+  category: "",
+  createTime: firebase.firestore.Timestamp.fromDate(new Date()),
+  updateTime: firebase.firestore.Timestamp.fromDate(new Date()),
+  tag: ["tag"],
+  public: true,
+};
