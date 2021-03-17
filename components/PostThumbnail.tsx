@@ -5,7 +5,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const url = "http://localhost3000/api/image/";
+const url = "http://localhost:3000/api/image/";
 
 export default function PostThumbnail({ post }: { post: Post }) {
   // サムネイルの画像のpathを保持するstate。
@@ -13,11 +13,14 @@ export default function PostThumbnail({ post }: { post: Post }) {
   const [img_url, set_img_url] = useState("/images/no_image.png");
   // api/image/[path]より画像を受け取る。
   fetch(url + post.id + "/thumbnail").then((res) => {
-    res.json().then((json) => {
-      if (json.url != "image not found") {
-        set_img_url(json.url);
-      }
-    });
+    res
+      .json()
+      .then((json) => {
+        if (json.url != "image not found") {
+          set_img_url(json.url);
+        }
+      })
+      .catch((err) => {});
   });
 
   return (
