@@ -62,6 +62,7 @@ export const getAllPosts = async (
           updateTime: post_data.updateTime.toDate(),
           tag: post_data.tag,
           category: post_data.category,
+          public: post_data.public,
         };
         data.push(post_tmp);
       });
@@ -91,6 +92,7 @@ export const getPost = async (id: string) => {
     updateTime: post_data.updateTime.toDate(),
     tag: post_data.tag,
     category: post_data.category,
+    public: post_data.public,
   };
 
   return post;

@@ -17,6 +17,7 @@ export type Post = {
   tag: string[];
   createTime?: Date;
   updateTime?: Date;
+  public: boolean;
 };
 
 // idはルーティングに使う。そのため英語で、"/"などの記号を使わないものにする。(日本語でルーティングしてあるとコレジャナイ感すごい)
@@ -55,5 +56,5 @@ export const initial_post = {
   createTime: firebase.firestore.Timestamp.fromDate(new Date()),
   updateTime: firebase.firestore.Timestamp.fromDate(new Date()),
   tag: ["tag"],
-  public: true,
+  public: false,
 };
