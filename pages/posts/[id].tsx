@@ -56,6 +56,8 @@ export default function Home(props) {
 
   const [title, setTitle] = useState<string>(post.title);
   const [body, setBody] = useState<string>(post.body);
+  const [postTags, setPostTags] = useState<string[]>(post.tag);
+  const [postCategory, setPostCategory] = useState<string>(post.category);
   const [imglinks, setImglinks] = useState<{ name: string; url: string }[]>([]);
 
   useEffect(() => {
@@ -84,10 +86,10 @@ export default function Home(props) {
       <Layout>
         <div className="flex p-5 bg-gray-200">
           <div className="w-1/2 p-5">
-            <div className="flex">
+            <div className="flex m-5">
               {imglinks.map((link, index) => {
                 return (
-                  <div>
+                  <div key={`image_${index}`}>
                     <Image
                       src={link.url}
                       height={30}
@@ -103,12 +105,72 @@ export default function Home(props) {
                 <input type="file" onChange={uploadHandle} />
               </label>
             </div>
+            <div className="m-5">
+              <label>
+                カテゴリー選択
+                <select
+                  defaultValue={postCategory}
+                  onChange={(e) => {
+                    setPostCategory(e.target.value);
+                  }}
+                >
+                  {categories.map((category) => {
+                    return (
+                      <option key={`category_${category.name}`}>
+                        {category.name}
+                      </option>
+                    );
+                  })}
+                </select>
+              </label>
+            </div>
+            <div className="m-5">
+              <div className="flex m-3">
+                {postTags.map((tag) => {
+                  return (
+                    <p
+                      key={`tag_${tag}`}
+                      onClick={() => {
+                        const tmp = [];
+                        postTags.forEach((tag_) => {
+                          if (tag != tag_) tmp.push(tag_);
+                        });
+                        const set = new Set(tmp);
+                        setPostTags(Array.from(set));
+                      }}
+                    >{`✕ ${tag}, `}</p>
+                  );
+                })}
+              </div>
+              <label className="">
+                タグを追加
+                <select
+                  onChange={(e) => {
+                    const tmp = postTags.slice();
+                    tmp.push(e.target.value);
+                    const set = new Set(tmp);
+                    setPostTags(Array.from(set));
+                  }}
+                >
+                  {tags.map((tag_list) => {
+                    return tag_list.children.map((tag) => {
+                      return (
+                        <option value={tag.name} key={`select_${tag.name}`}>
+                          {tag.name}
+                        </option>
+                      );
+                    });
+                  })}
+                </select>
+              </label>
+            </div>
             <input
               type="text"
               value={title}
               onChange={(e) => {
                 setTitle(e.currentTarget.value);
               }}
+              className="m-5"
             />
             <textarea
               cols={50}
