@@ -107,7 +107,7 @@ export default function Home(props) {
     });
   }
 
-  // 記事の公開非公開を設定
+  // 記事の公開非公開を設定。
   function publishHandle(event) {
     event.preventDefault();
     if (!window.confirm(`記事を${postPublic ? "非公開に" : "公開"}しますか？`))
