@@ -9,7 +9,11 @@ import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown/with-html";
 import gfm from "remark-gfm";
 import useSwr from "swr";
-import { postImage, getPostImages } from "../../firebase/cliantSideFunction";
+import {
+  postImage,
+  getPostImages,
+  editPost,
+} from "../../firebase/cliantSideFunction";
 import { GetStaticPaths, GetStaticProps } from "next";
 import {
   getAllPosts,
@@ -59,6 +63,7 @@ export default function Home(props) {
   const [postTags, setPostTags] = useState<string[]>(post.tag);
   const [postCategory, setPostCategory] = useState<string>(post.category);
   const [imglinks, setImglinks] = useState<{ name: string; url: string }[]>([]);
+  const [postPublic, setPostPublic] = useState<boolean>(post.public);
 
   useEffect(() => {
     getPostImages(post.id as string).then((res) => {
@@ -77,6 +82,31 @@ export default function Home(props) {
     });
   }
 
+  // 記事を更新する。
+  function saveHandle(event) {
+    event.preventDefault();
+    editPost("PUT", post.id, {
+      ...post,
+      title,
+      body,
+      category: postCategory,
+      tag: postTags,
+    });
+  }
+
+  // 記事を削除する。
+  function deleteHandle(event) {
+    event.preventDefault();
+    editPost("DELETE", post.id);
+  }
+
+  // 記事の公開非公開を設定
+  function publishHandle(event) {
+    event.preventDefault();
+    editPost(postPublic ? "HIDE" : "PUBLISH", post.id);
+    setPostPublic(!postPublic);
+  }
+
   return (
     <div>
       <Head>
@@ -86,6 +116,28 @@ export default function Home(props) {
       <Layout>
         <div className="flex p-5 bg-gray-200">
           <div className="w-1/2 p-5">
+            <div className="flex">
+              <div className="">
+                <button className="w-32 h-16 bg-main1" onClick={saveHandle}>
+                  SAVE
+                </button>
+              </div>
+              <div className="">
+                <button
+                  className={`w-32 h-16 ${
+                    postPublic ? "bg-gray-400" : "bg-red-500"
+                  }`}
+                  onClick={publishHandle}
+                >
+                  {postPublic ? "非公開にする" : "公開する"}
+                </button>
+              </div>
+              <div className="">
+                <button className="w-32 h-16 bg-red-600" onClick={deleteHandle}>
+                  記事を削除
+                </button>
+              </div>
+            </div>
             <div className="flex m-5">
               {imglinks.map((link, index) => {
                 return (
@@ -164,14 +216,17 @@ export default function Home(props) {
                 </select>
               </label>
             </div>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => {
-                setTitle(e.currentTarget.value);
-              }}
-              className="m-5"
-            />
+            <label>
+              タイトル
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.currentTarget.value);
+                }}
+                className="m-5"
+              />
+            </label>
             <textarea
               cols={50}
               rows={100}
