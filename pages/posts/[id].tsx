@@ -9,7 +9,11 @@ import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown/with-html";
 import gfm from "remark-gfm";
 import useSwr from "swr";
-import { postImage, getPostImages } from "../../firebase/cliantSideFunction";
+import {
+  postImage,
+  getPostImages,
+  editPost,
+} from "../../firebase/cliantSideFunction";
 import { GetStaticPaths, GetStaticProps } from "next";
 import {
   getAllPosts,
@@ -18,6 +22,7 @@ import {
   getPost,
 } from "../../firebase/dbFunctions";
 import { Category, Post, Tags } from "../../firebase/firebase";
+import { useRouter } from "next/router";
 
 // bodyの整形。以下の処理を順に行う。
 // ・改行の挿入
@@ -59,6 +64,9 @@ export default function Home(props) {
   const [postTags, setPostTags] = useState<string[]>(post.tag);
   const [postCategory, setPostCategory] = useState<string>(post.category);
   const [imglinks, setImglinks] = useState<{ name: string; url: string }[]>([]);
+  const [postPublic, setPostPublic] = useState<boolean>(post.public);
+
+  const router = useRouter();
 
   useEffect(() => {
     getPostImages(post.id as string).then((res) => {
@@ -70,11 +78,42 @@ export default function Home(props) {
   function uploadHandle(event: React.ChangeEvent<HTMLInputElement>) {
     event.preventDefault();
     const file: File = event.target.files[0];
-    postImage(`test/${file.name}`, file).then((url) => {
+    postImage(`${post.id}/${file.name}`, file).then((url) => {
       const links = imglinks.slice();
       links.push({ name: file.name, url });
       setImglinks(links);
     });
+  }
+
+  // 記事を更新する。
+  function saveHandle(event) {
+    event.preventDefault();
+    if (!window.confirm("記事を更新しますか？")) return false;
+    editPost("PUT", post.id, {
+      ...post,
+      title,
+      body,
+      category: postCategory,
+      tag: postTags,
+    });
+  }
+
+  // 記事を削除する。
+  function deleteHandle(event) {
+    event.preventDefault();
+    if (!window.confirm("記事を削除しますか？")) return false;
+    editPost("DELETE", post.id).then(() => {
+      router.push("/");
+    });
+  }
+
+  // 記事の公開非公開を設定
+  function publishHandle(event) {
+    event.preventDefault();
+    if (!window.confirm(`記事を${postPublic ? "非公開に" : "公開"}しますか？`))
+      return false;
+    editPost(postPublic ? "HIDE" : "PUBLISH", post.id);
+    setPostPublic(!postPublic);
   }
 
   return (
@@ -86,6 +125,28 @@ export default function Home(props) {
       <Layout>
         <div className="flex p-5 bg-gray-200">
           <div className="w-1/2 p-5">
+            <div className="flex">
+              <div className="">
+                <button className="w-32 h-16 bg-main1" onClick={saveHandle}>
+                  SAVE
+                </button>
+              </div>
+              <div className="">
+                <button
+                  className={`w-32 h-16 ${
+                    postPublic ? "bg-gray-400" : "bg-red-500"
+                  }`}
+                  onClick={publishHandle}
+                >
+                  {postPublic ? "非公開にする" : "公開する"}
+                </button>
+              </div>
+              <div className="">
+                <button className="w-32 h-16 bg-red-600" onClick={deleteHandle}>
+                  記事を削除
+                </button>
+              </div>
+            </div>
             <div className="flex m-5">
               {imglinks.map((link, index) => {
                 return (
@@ -100,6 +161,8 @@ export default function Home(props) {
                   </div>
                 );
               })}
+            </div>
+            <div>
               <label>
                 画像をアップロード
                 <input type="file" onChange={uploadHandle} />
@@ -164,16 +227,21 @@ export default function Home(props) {
                 </select>
               </label>
             </div>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => {
-                setTitle(e.currentTarget.value);
-              }}
-              className="m-5"
-            />
+            <div>
+              <label>
+                タイトル
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => {
+                    setTitle(e.currentTarget.value);
+                  }}
+                  className="m-5"
+                />
+              </label>
+            </div>
             <textarea
-              cols={50}
+              cols={80}
               rows={100}
               onChange={(eve) => {
                 setBody(eve.currentTarget.value);
