@@ -22,6 +22,7 @@ import {
   getPost,
 } from "../../firebase/dbFunctions";
 import { Category, Post, Tags } from "../../firebase/firebase";
+import { useRouter } from "next/router";
 
 // bodyの整形。以下の処理を順に行う。
 // ・改行の挿入
@@ -65,6 +66,8 @@ export default function Home(props) {
   const [imglinks, setImglinks] = useState<{ name: string; url: string }[]>([]);
   const [postPublic, setPostPublic] = useState<boolean>(post.public);
 
+  const router = useRouter();
+
   useEffect(() => {
     getPostImages(post.id as string).then((res) => {
       setImglinks(res);
@@ -75,7 +78,7 @@ export default function Home(props) {
   function uploadHandle(event: React.ChangeEvent<HTMLInputElement>) {
     event.preventDefault();
     const file: File = event.target.files[0];
-    postImage(`test/${file.name}`, file).then((url) => {
+    postImage(`${post.id}/${file.name}`, file).then((url) => {
       const links = imglinks.slice();
       links.push({ name: file.name, url });
       setImglinks(links);
@@ -85,6 +88,7 @@ export default function Home(props) {
   // 記事を更新する。
   function saveHandle(event) {
     event.preventDefault();
+    if (!window.confirm("記事を更新しますか？")) return false;
     editPost("PUT", post.id, {
       ...post,
       title,
@@ -97,12 +101,17 @@ export default function Home(props) {
   // 記事を削除する。
   function deleteHandle(event) {
     event.preventDefault();
-    editPost("DELETE", post.id);
+    if (!window.confirm("記事を削除しますか？")) return false;
+    editPost("DELETE", post.id).then(() => {
+      router.push("/");
+    });
   }
 
   // 記事の公開非公開を設定
   function publishHandle(event) {
     event.preventDefault();
+    if (!window.confirm(`記事を${postPublic ? "非公開に" : "公開"}しますか？`))
+      return false;
     editPost(postPublic ? "HIDE" : "PUBLISH", post.id);
     setPostPublic(!postPublic);
   }
@@ -152,6 +161,8 @@ export default function Home(props) {
                   </div>
                 );
               })}
+            </div>
+            <div>
               <label>
                 画像をアップロード
                 <input type="file" onChange={uploadHandle} />
@@ -216,19 +227,21 @@ export default function Home(props) {
                 </select>
               </label>
             </div>
-            <label>
-              タイトル
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => {
-                  setTitle(e.currentTarget.value);
-                }}
-                className="m-5"
-              />
-            </label>
+            <div>
+              <label>
+                タイトル
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => {
+                    setTitle(e.currentTarget.value);
+                  }}
+                  className="m-5"
+                />
+              </label>
+            </div>
             <textarea
-              cols={50}
+              cols={80}
               rows={100}
               onChange={(eve) => {
                 setBody(eve.currentTarget.value);
