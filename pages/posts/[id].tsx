@@ -26,16 +26,16 @@ import { useRouter } from "next/router";
 
 // bodyの整形。以下の処理を順に行う。
 // ・改行の挿入
-// ・画像の挿入。 画像は<img ファイル名 width={幅} height={高さ} className=""/>と入力。それぞれの間に半角スペース必須。width, height, classNameは順不同。
+// ・画像の挿入。 画像は<image ファイル名 width={幅} height={高さ} className=""/>と入力。それぞれの間に半角スペース必須。width, height, classNameは順不同。
 //   classNameでstyling出来るが必要ない場合は書かなくてもいい。
-//   この関数によって、ファイル名の部分にsrcを挿入する。 例) <img image.jps width={100} height={100} className="p-1" />
+//   この関数によって、ファイル名の部分にsrcを挿入する。 例) <image image.jps width={100} height={100} className="p-1" />
 function formatMD(body: string, imglinks: { name: string; url: string }[]) {
   if (typeof body != "string") return "body is not string";
   let res = body;
 
   let from_index = 0;
   while (true) {
-    const start = res.indexOf("<img", from_index);
+    const start = res.indexOf("<image", from_index);
     const end = res.indexOf("/>", from_index);
     if (start == -1 || end == -1) break;
     const slice = res.slice(start, end).split(" ");
@@ -92,7 +92,7 @@ export default function Home(props) {
     editPost("PUT", post.id, {
       ...post,
       title,
-      body,
+      body: formatMD(body, imglinks),
       category: postCategory,
       tag: postTags,
     });
