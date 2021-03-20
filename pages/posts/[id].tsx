@@ -65,6 +65,9 @@ export default function Home(props) {
   const [postCategory, setPostCategory] = useState<string>(post.category);
   const [imglinks, setImglinks] = useState<{ name: string; url: string }[]>([]);
   const [postPublic, setPostPublic] = useState<boolean>(post.public);
+  const [thumbnail, setThumbnail] = useState<string>(
+    post.thumbnail ? post.thumbnail : "/images/no_image.png"
+  );
 
   const router = useRouter();
 
@@ -85,6 +88,15 @@ export default function Home(props) {
     });
   }
 
+  // thumbnailのアップロード
+  function uploadThumbnailHandle(event) {
+    event.preventDefault();
+    const file: File = event.target.files[0];
+    postImage(`${post.id}/${file.name}`, file).then((url) => {
+      setThumbnail(url);
+    });
+  }
+
   // 記事を更新する。
   function saveHandle(event) {
     event.preventDefault();
@@ -95,6 +107,7 @@ export default function Home(props) {
       body: formatMD(body, imglinks),
       category: postCategory,
       tag: postTags,
+      thumbnail,
     });
   }
 
@@ -240,6 +253,11 @@ export default function Home(props) {
                 />
               </label>
             </div>
+            <div>
+              <label>
+                <input type="file" onChange={uploadThumbnailHandle} />
+              </label>
+            </div>
             <textarea
               cols={80}
               rows={100}
@@ -253,7 +271,7 @@ export default function Home(props) {
           <div className="w-1/2">
             <div className={" markdown-body p-6 bg-white mt-5"}>
               <div>
-                {/* <Image src={img_url} height={100} width={100} /> */}
+                <Image src={thumbnail} height={100} width={100} />
                 <h1>{title}</h1>
               </div>
               <div className="flex h-8">
