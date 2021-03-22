@@ -21,7 +21,7 @@ import {
   getTags,
   getPost,
 } from "../../firebase/dbFunctions";
-import { Category, Post, Tags } from "../../firebase/firebase";
+import { Category, Post, Tags, Tag } from "../../firebase/firebase";
 import { useRouter } from "next/router";
 
 // bodyの整形。以下の処理を順に行う。
@@ -61,13 +61,22 @@ export default function Home(props) {
 
   const [title, setTitle] = useState<string>(post.title);
   const [body, setBody] = useState<string>(post.body);
-  const [postTags, setPostTags] = useState<string[]>(post.tag);
   const [postCategory, setPostCategory] = useState<string>(post.category);
   const [imglinks, setImglinks] = useState<{ name: string; url: string }[]>([]);
   const [postPublic, setPostPublic] = useState<boolean>(post.public);
   const [thumbnail, setThumbnail] = useState<string>(
     post.thumbnail ? post.thumbnail : "/images/no_image.png"
   );
+  const tag_tmp: Tag[] = [];
+  post.tag.forEach((post_tag) => {
+    tags.forEach((tags) => {
+      const find_tag = tags.children.find((tag) => {
+        tags.id == post_tag;
+      });
+      if (find_tag != undefined) tag_tmp.push(find_tag);
+    });
+  });
+  const [postTags, setPostTags] = useState<Tag[]>(tag_tmp);
 
   const router = useRouter();
 
@@ -106,7 +115,9 @@ export default function Home(props) {
       title,
       body: formatMD(body, imglinks),
       category: postCategory,
-      tag: postTags,
+      tag: postTags.map((tag) => {
+        return tag.id;
+      }),
       thumbnail,
     });
   }
@@ -192,7 +203,10 @@ export default function Home(props) {
                 >
                   {categories.map((category) => {
                     return (
-                      <option key={`category_${category.name}`}>
+                      <option
+                        key={`category_${category.name}`}
+                        value={category.id}
+                      >
                         {category.name}
                       </option>
                     );
@@ -205,7 +219,7 @@ export default function Home(props) {
                 {postTags.map((tag) => {
                   return (
                     <p
-                      key={`tag_${tag}`}
+                      key={`tag_${typeof tag == "object" ? tag.id : tag}`}
                       onClick={() => {
                         const tmp = [];
                         postTags.forEach((tag_) => {
@@ -214,7 +228,7 @@ export default function Home(props) {
                         const set = new Set(tmp);
                         setPostTags(Array.from(set));
                       }}
-                    >{`✕ ${tag}, `}</p>
+                    >{`✕ ${typeof tag == "object" ? tag.name : tag}, `}</p>
                   );
                 })}
               </div>
@@ -223,7 +237,8 @@ export default function Home(props) {
                 <select
                   onChange={(e) => {
                     const tmp = postTags.slice();
-                    tmp.push(e.target.value);
+                    tmp.push(JSON.parse(e.target.value));
+                    console.log(tmp);
                     const set = new Set(tmp);
                     setPostTags(Array.from(set));
                   }}
@@ -231,7 +246,10 @@ export default function Home(props) {
                   {tags.map((tag_list) => {
                     return tag_list.children.map((tag) => {
                       return (
-                        <option value={tag.name} key={`select_${tag.name}`}>
+                        <option
+                          value={JSON.stringify(tag)}
+                          key={`select_${tag.name}`}
+                        >
                           {tag.name}
                         </option>
                       );
