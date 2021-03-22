@@ -63,7 +63,9 @@ export const getAllPosts = async (
           tag: post_data.tag,
           category: post_data.category,
           public: post_data.public,
-          thumbnail: post_data.thumbnail,
+          thumbnail: post_data.thumbnail
+            ? post_data.thumbnail
+            : "/images/no_image.png",
         };
         data.push(post_tmp);
       });
@@ -94,7 +96,9 @@ export const getPost = async (id: string) => {
     tag: post_data.tag,
     category: post_data.category,
     public: post_data.public,
-    thumbnail: post_data.thumbnail,
+    thumbnail: post_data.thumbnail
+      ? post_data.thumbnail
+      : "/images/no_image.png",
   };
 
   return post;
