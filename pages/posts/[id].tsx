@@ -4,6 +4,7 @@ import Layout from "../../components/Layout";
 // githubのmdと同様なcss
 import "github-markdown-css";
 // markdownの表示のカスタマイズ。
+import MDstyle from "../../components/css/markdown_style.module.css";
 //import style from "../../components/css/markdown_style.module.css";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown/with-html";
@@ -287,7 +288,7 @@ export default function Home(props) {
             />
           </div>
           <div className="w-1/2">
-            <div className={" markdown-body p-6 bg-white mt-5"}>
+            <div className={"  p-6 bg-white mt-5"}>
               <div>
                 <Image src={thumbnail} height={100} width={100} />
                 <h1>{title}</h1>
@@ -309,9 +310,11 @@ export default function Home(props) {
                   );
                 })} */}
               </div>
-              <ReactMarkdown plugins={[[gfm]]} allowDangerousHtml>
-                {formatMD(body, imglinks)}
-              </ReactMarkdown>
+              <div className={`mt-16 markdown-body ${MDstyle.markdown_body}`}>
+                <ReactMarkdown plugins={[[gfm]]} allowDangerousHtml>
+                  {formatMD(body, imglinks)}
+                </ReactMarkdown>
+              </div>
             </div>
           </div>
         </div>

@@ -1,7 +1,23 @@
 .markdown_body h1 {
-  margin-top: 5rem;
+  margin-top: 8rem;
 }
 
 .markdown_body h2 {
   margin-top: 5rem;
+}
+
+.markdown_body h3 {
+  margin-top: 3rem;
+}
+
+.markdown_body ul {
+  list-style-type: disc;
+}
+
+.markdown_body li {
+  margin: 1rem 0;
+}
+
+.markdown_body p {
+  margin-left: 1rem;
 }
