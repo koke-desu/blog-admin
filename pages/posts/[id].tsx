@@ -71,13 +71,14 @@ export default function Home(props) {
   const tag_tmp: Tag[] = [];
   post.tag.forEach((post_tag) => {
     tags.forEach((tags) => {
-      const find_tag = tags.children.find((tag) => {
-        tags.id == post_tag;
+      const find_tag = tags.children.forEach((tag) => {
+        if (tag.id == post_tag) {
+          tag_tmp.push(tag);
+        }
       });
-      if (find_tag != undefined) tag_tmp.push(find_tag);
     });
   });
-  const [postTags, setPostTags] = useState<Tag[]>(tag_tmp);
+  const [postTags, setPostTags] = useState<Tag[]>(tag_tmp.slice());
 
   const router = useRouter();
 
