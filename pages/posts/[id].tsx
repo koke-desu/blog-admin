@@ -173,14 +173,14 @@ export default function Home(props) {
                 </button>
               </div>
             </div>
-            <div className="flex m-5">
+            <div className="flex m-5 flex-wrap">
               {imglinks.map((link, index) => {
                 return (
-                  <div key={`image_${index}`}>
+                  <div key={`image_${index}`} className="m-2">
                     <Image
                       src={link.url}
-                      height={30}
-                      width={30}
+                      height={50}
+                      width={50}
                       key={`img-${index}-${link.name}`}
                     />
                     <p>{link.name}</p>
@@ -280,7 +280,7 @@ export default function Home(props) {
             </div>
             <textarea
               cols={80}
-              rows={100}
+              rows={500}
               onChange={(eve) => {
                 setBody(eve.currentTarget.value);
               }}

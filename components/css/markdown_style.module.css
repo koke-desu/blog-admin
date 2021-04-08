@@ -21,3 +21,7 @@
 .markdown_body p {
   margin-left: 1rem;
 }
+
+.markdown_body img {
+  margin: 2rem 0;
+}
